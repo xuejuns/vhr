@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.sang.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="org.sang.bean.Order">
+        <id column="orderid" property="orderid"/>
+        <result column="customerid" property="customerid"/>
+        <result column="count" property="ordercount"/>
+        <result column="amount" property="orderamount"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+    <select id="findAllOrder" resultMap="BaseResultMap">
+        select orderid,customerid,count,amount,remark from t_order
+    </select>
+    <select id="findOrderByPage" resultMap="BaseResultMap">
+        select orderid,customerid,count,amount,remark from t_order limit #{start},#{size}
+    </select>
+    <update id="updateOrder">
+        update t_order
+        <set>
+            <if test="order.customerid != null">
+                customerid = #{order.customerid,jdbcType=BIGINT},
+            </if>
+            <if test="order.orderamount != null">
+                amount = #{order.orderamount,jdbcType=BIGINT},
+            </if>
+            <if test="order.ordercount != null">
+                count = #{order.ordercount,jdbcType=BIGINT},
+            </if>
+            <if test="order.remark != null">
+                remark = #{order.remark,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where orderid = #{order.orderid,jdbcType=BIGINT}
+    </update>
+    <delete id="deleteOrder">
+        DELETE FROM t_order WHERE orderid =#{orderid,jdbcType=BIGINT}
+    </delete>
+    <insert id="insertOrder" parameterType="org.sang.bean.Order">
+        insert into t_order (customerid, count,
+        amount, remark)
+        values
+        (
+            #{order.customerid,jdbcType=BIGINT}, #{order.orderamount,jdbcType=BIGINT},
+            #{order.ordercount,jdbcType=BIGINT}, #{order.remark}
+        )
+        <selectKey resultType="Integer" order="AFTER" keyProperty="order.orderid">
+            SELECT LAST_INSERT_ID() AS orderid
+        </selectKey>
+    </insert>
+    <select id="findOneOrder" resultMap="BaseResultMap">
+        select orderid,customerid,count,amount from t_order where orderid = #{orderid,jdbcType=BIGINT}
+    </select>
+</mapper>
